@@ -19,14 +19,10 @@ class LiveRoomViewController: UIViewController {
     @IBOutlet weak var broadcastButton: UIButton!
     @IBOutlet var sessionButtons: [UIButton]!
     @IBOutlet weak var audioMuteButton: UIButton!
-    @IBOutlet weak var enhancerButton: UIButton!
     
     var roomName: String!
     var clientRole = AgoraRtcClientRole.clientRole_Audience {
         didSet {
-            if isBroadcaster {
-                shouldEnhancer = true
-            }
             updateButtonsVisiablity()
         }
     }
@@ -35,12 +31,6 @@ class LiveRoomViewController: UIViewController {
     
     //MARK: - engine & session view
     var rtcEngine: AgoraRtcEngineKit!
-    fileprivate lazy var agoraEnhancer: AgoraYuvEnhancerObjc? = {
-        let enhancer = AgoraYuvEnhancerObjc()
-        enhancer.lighteningFactor = 0.7
-        enhancer.smoothness = 0.7
-        return enhancer
-    }()
     fileprivate var isBroadcaster: Bool {
         return clientRole == .clientRole_Broadcaster
     }
@@ -48,16 +38,6 @@ class LiveRoomViewController: UIViewController {
         didSet {
             rtcEngine?.muteLocalAudioStream(isMuted)
             audioMuteButton?.setImage(UIImage(named: isMuted ? "btn_mute_cancel" : "btn_mute"), for: .normal)
-        }
-    }
-    fileprivate var shouldEnhancer = true {
-        didSet {
-            if shouldEnhancer {
-                agoraEnhancer?.turnOn()
-            } else {
-                agoraEnhancer?.turnOff()
-            }
-            enhancerButton?.setImage(UIImage(named: shouldEnhancer ? "btn_beautiful_cancel" : "btn_beautiful"), for: .normal)
         }
     }
     
@@ -95,10 +75,6 @@ class LiveRoomViewController: UIViewController {
     
     @IBAction func doMutePressed(_ sender: UIButton) {
         isMuted = !isMuted
-    }
-    
-    @IBAction func doEnhancerPressed(_ sender: UIButton) {
-        shouldEnhancer = !shouldEnhancer
     }
     
     @IBAction func doBroadcastPressed(_ sender: UIButton) {
@@ -156,8 +132,6 @@ private extension LiveRoomViewController {
             session.hostingView.removeFromSuperview()
         }
         videoSessions.removeAll()
-        
-        agoraEnhancer?.turnOff()
         
         delegate?.liveVCNeedClose(self)
     }
@@ -261,10 +235,6 @@ private extension LiveRoomViewController {
             DispatchQueue.main.async(execute: {
                 self.alert(string: "Join channel failed: \(code)")
             })
-        }
-        
-        if isBroadcaster {
-            shouldEnhancer = true
         }
     }
 }
