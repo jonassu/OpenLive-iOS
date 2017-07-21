@@ -41,7 +41,7 @@ Finally, Open OpenLive.xcodeproj, connect your iPhone／iPad device, setup your 
 ## Connect Us
 
 - You can find full API document at [Document Center](https://docs.agora.io/en/)
-- You can fire bugs about this demo at [issue](https://github.com/AgoraIO/OpenLive-iOS/issues)
+- You can file bugs about this demo at [issue](https://github.com/AgoraIO/OpenLive-iOS/issues)
 
 ## License
 
