@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AgoraRtcEngineKit
 
 protocol LiveRoomVCDelegate: NSObjectProtocol {
     func liveVCNeedClose(_ liveVC: LiveRoomViewController)
