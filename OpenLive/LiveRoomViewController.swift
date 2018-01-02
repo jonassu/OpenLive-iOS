@@ -22,18 +22,18 @@ class LiveRoomViewController: UIViewController {
     @IBOutlet weak var audioMuteButton: UIButton!
     
     var roomName: String!
-    var clientRole = AgoraRtcClientRole.clientRole_Audience {
+    var clientRole = AgoraClientRole.audience {
         didSet {
             updateButtonsVisiablity()
         }
     }
-    var videoProfile: AgoraRtcVideoProfile!
+    var videoProfile: AgoraVideoProfile!
     weak var delegate: LiveRoomVCDelegate?
     
     //MARK: - engine & session view
     var rtcEngine: AgoraRtcEngineKit!
     fileprivate var isBroadcaster: Bool {
-        return clientRole == .clientRole_Broadcaster
+        return clientRole == .broadcaster
     }
     fileprivate var isMuted = false {
         didSet {
@@ -80,15 +80,15 @@ class LiveRoomViewController: UIViewController {
     
     @IBAction func doBroadcastPressed(_ sender: UIButton) {
         if isBroadcaster {
-            clientRole = .clientRole_Audience
+            clientRole = .audience
             if fullSession?.uid == 0 {
                 fullSession = nil
             }
         } else {
-            clientRole = .clientRole_Broadcaster
+            clientRole = .broadcaster
         }
         
-        rtcEngine.setClientRole(clientRole, withKey: nil)
+        rtcEngine.setClientRole(clientRole)
         updateInterface(withAnimation :true)
     }
     
@@ -176,11 +176,11 @@ private extension LiveRoomViewController {
     func setStreamType(forSessions sessions: [VideoSession], fullSession: VideoSession?) {
         if let fullSession = fullSession {
             for session in sessions {
-                rtcEngine.setRemoteVideoStream(UInt(session.uid), type: (session == fullSession ? .videoStream_High : .videoStream_Low))
+                rtcEngine.setRemoteVideoStream(UInt(session.uid), type: (session == fullSession ? .high : .low))
             }
         } else {
             for session in sessions {
-                rtcEngine.setRemoteVideoStream(UInt(session.uid), type: .videoStream_High)
+                rtcEngine.setRemoteVideoStream(UInt(session.uid), type: .high)
             }
         }
     }
@@ -216,11 +216,11 @@ private extension LiveRoomViewController {
 private extension LiveRoomViewController {
     func loadAgoraKit() {
         rtcEngine = AgoraRtcEngineKit.sharedEngine(withAppId: KeyCenter.AppId, delegate: self)
-        rtcEngine.setChannelProfile(.channelProfile_LiveBroadcasting)
+        rtcEngine.setChannelProfile(.liveBroadcasting)
         rtcEngine.enableDualStreamMode(true)
         rtcEngine.enableVideo()
         rtcEngine.setVideoProfile(videoProfile, swapWidthAndHeight: true)
-        rtcEngine.setClientRole(clientRole, withKey: nil)
+        rtcEngine.setClientRole(clientRole)
         
         if isBroadcaster {
             rtcEngine.startPreview()
@@ -228,7 +228,7 @@ private extension LiveRoomViewController {
         
         addLocalSession()
         
-        let code = rtcEngine.joinChannel(byKey: nil, channelName: roomName, info: nil, uid: 0, joinSuccess: nil)
+        let code = rtcEngine.joinChannel(byToken: nil, channelId: roomName, info: nil, uid: 0, joinSuccess: nil)
         if code == 0 {
             setIdleTimerActive(false)
             rtcEngine.setEnableSpeakerphone(true)
@@ -252,7 +252,7 @@ extension LiveRoomViewController: AgoraRtcEngineDelegate {
         }
     }
     
-    func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraRtcUserOfflineReason) {
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
         var indexToDelete: Int?
         for (index, session) in videoSessions.enumerated() {
             if session.uid == Int64(uid) {
