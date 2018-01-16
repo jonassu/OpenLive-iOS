@@ -13,12 +13,10 @@ class ProfileCell: UITableViewCell {
     
     @IBOutlet weak var resLabel: UILabel!
     @IBOutlet weak var frameLabel: UILabel!
-    @IBOutlet weak var bitRateLabel: UILabel!
     
     func update(withProfile profile: AgoraVideoProfile, isSelected: Bool) {
         resLabel.text = profile.resolution()
         frameLabel.text = profile.fps()
-        bitRateLabel.text = profile.bitRate()
         backgroundColor = isSelected ? UIColor(red: 0, green: 0, blue: 0.5, alpha: 0.3) : UIColor.white
     }
 }
@@ -38,17 +36,5 @@ private extension AgoraVideoProfile {
     
     func fps() -> String? {
         return "15"
-    }
-    
-    func bitRate() -> String? {
-        switch self {
-        case .landscape120P: return "65"
-        case .landscape180P: return "140"
-        case .landscape240P: return "200"
-        case .landscape360P: return "400"
-        case .landscape480P: return "500"
-        case .landscape720P: return "1130"
-        default: return nil
-        }
     }
 }
