@@ -14,7 +14,7 @@ class MainViewController: UIViewController {
     @IBOutlet weak var roomNameTextField: UITextField!
     @IBOutlet weak var popoverSourceView: UIView!
     
-    fileprivate var videoProfile = AgoraVideoProfile.landscape360P
+    fileprivate var videoProfile = AgoraVideoDimension640x360
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let segueId = segue.identifier else {
@@ -66,7 +66,7 @@ private extension MainViewController {
 }
 
 extension MainViewController: SettingsVCDelegate {
-    func settingsVC(_ settingsVC: SettingsViewController, didSelectProfile profile: AgoraVideoProfile) {
+    func settingsVC(_ settingsVC: SettingsViewController, didSelectProfile profile: CGSize) {
         videoProfile = profile
         dismiss(animated: true, completion: nil)
     }
